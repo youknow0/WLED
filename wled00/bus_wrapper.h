@@ -69,6 +69,8 @@
 #define I_HS_P98_3 35
 #define I_SS_P98_3 36
 
+#define I_HS2_WS1_3 37
+
 
 /*** ESP8266 Neopixel methods ***/
 #ifdef ESP8266
@@ -137,6 +139,9 @@
 //#define B_HS_WS1_3 NeoPixelBrightnessBus<NeoRbgFeature, NeoWs2801Spi20MhzMethod>
 //#define B_HS_WS1_3 NeoPixelBrightnessBus<NeoRbgFeature, NeoWs2801SpiMethod>     // 10MHz
 #define B_HS_WS1_3 NeoPixelBrightnessBus<NeoRbgFeature, NeoWs2801Spi2MhzMethod> //slower, more compatible
+#ifdef ARDUINO_ARCH_ESP32
+#define B_HS2_WS1_3 NeoPixelBrightnessBus<NeoRbgFeature, Ws2801MethodBase<TwoWireHspiImple<SpiSpeed2Mhz>>> //slower, more compatible
+#endif
 #define B_SS_WS1_3 NeoPixelBrightnessBus<NeoRbgFeature, NeoWs2801Method>
 
 //P9813
@@ -204,6 +209,7 @@ class PolyBus {
       case I_HS_DOT_3: (static_cast<B_HS_DOT_3*>(busPtr))->Begin(pins[1], -1, pins[0], -1); break;
       case I_HS_LPD_3: (static_cast<B_HS_LPD_3*>(busPtr))->Begin(pins[1], -1, pins[0], -1); break;
       case I_HS_WS1_3: (static_cast<B_HS_WS1_3*>(busPtr))->Begin(pins[1], -1, pins[0], -1); break;
+      case I_HS2_WS1_3: (static_cast<B_HS2_WS1_3*>(busPtr))->Begin(pins[1], -1, pins[0], -1); break;
       case I_HS_P98_3: (static_cast<B_HS_P98_3*>(busPtr))->Begin(pins[1], -1, pins[0], -1); break;
     #endif
       case I_SS_DOT_3: (static_cast<B_SS_DOT_3*>(busPtr))->Begin(); break;
@@ -255,6 +261,7 @@ class PolyBus {
       #ifndef CONFIG_IDF_TARGET_ESP32S2
       case I_32_I1_TM1_4: busPtr = new B_32_I1_TM1_4(len, pins[0]); break;
       #endif
+      case I_HS2_WS1_3: busPtr = new B_HS2_WS1_3(len, pins[1], pins[0]); break;
     #endif
       // for 2-wire: pins[1] is clk, pins[0] is dat.  begin expects (len, clk, dat)
       case I_HS_DOT_3: busPtr = new B_HS_DOT_3(len, pins[1], pins[0]); break;
@@ -311,6 +318,7 @@ class PolyBus {
       #ifndef CONFIG_IDF_TARGET_ESP32S2
       case I_32_I1_TM1_4: (static_cast<B_32_I1_TM1_4*>(busPtr))->Show(); break;
       #endif
+      case I_HS2_WS1_3: (static_cast<B_HS2_WS1_3*>(busPtr))->Show(); break;
     #endif
       case I_HS_DOT_3: (static_cast<B_HS_DOT_3*>(busPtr))->Show(); break;
       case I_SS_DOT_3: (static_cast<B_SS_DOT_3*>(busPtr))->Show(); break;
@@ -364,6 +372,7 @@ class PolyBus {
       #ifndef CONFIG_IDF_TARGET_ESP32S2
       case I_32_I1_TM1_4: return (static_cast<B_32_I1_TM1_4*>(busPtr))->CanShow(); break;
       #endif
+      case I_HS2_WS1_3: return (static_cast<B_HS2_WS1_3*>(busPtr))->CanShow(); break;
     #endif
       case I_HS_DOT_3: return (static_cast<B_HS_DOT_3*>(busPtr))->CanShow(); break;
       case I_SS_DOT_3: return (static_cast<B_SS_DOT_3*>(busPtr))->CanShow(); break;
@@ -441,6 +450,7 @@ class PolyBus {
       #ifndef CONFIG_IDF_TARGET_ESP32S2
       case I_32_I1_TM1_4: (static_cast<B_32_I1_TM1_4*>(busPtr))->SetPixelColor(pix, col); break;
       #endif
+      case I_HS2_WS1_3: (static_cast<B_HS2_WS1_3*>(busPtr))->SetPixelColor(pix, RgbColor(col.R,col.G,col.B)); break;
     #endif
       case I_HS_DOT_3: (static_cast<B_HS_DOT_3*>(busPtr))->SetPixelColor(pix, RgbColor(col.R,col.G,col.B)); break;
       case I_SS_DOT_3: (static_cast<B_SS_DOT_3*>(busPtr))->SetPixelColor(pix, RgbColor(col.R,col.G,col.B)); break;
@@ -494,6 +504,7 @@ class PolyBus {
       #ifndef CONFIG_IDF_TARGET_ESP32S2
       case I_32_I1_TM1_4: (static_cast<B_32_I1_TM1_4*>(busPtr))->SetBrightness(b); break;
       #endif
+      case I_HS2_WS1_3: (static_cast<B_HS2_WS1_3*>(busPtr))->SetBrightness(b); break;
     #endif
       case I_HS_DOT_3: (static_cast<B_HS_DOT_3*>(busPtr))->SetBrightness(b); break;
       case I_SS_DOT_3: (static_cast<B_SS_DOT_3*>(busPtr))->SetBrightness(b); break;
@@ -548,6 +559,7 @@ class PolyBus {
       #ifndef CONFIG_IDF_TARGET_ESP32S2
       case I_32_I1_TM1_4: col = (static_cast<B_32_I1_TM1_4*>(busPtr))->GetPixelColor(pix); break;
       #endif
+      case I_HS2_WS1_3: col = (static_cast<B_HS2_WS1_3*>(busPtr))->GetPixelColor(pix); break;
     #endif
       case I_HS_DOT_3: col = (static_cast<B_HS_DOT_3*>(busPtr))->GetPixelColor(pix); break;
       case I_SS_DOT_3: col = (static_cast<B_SS_DOT_3*>(busPtr))->GetPixelColor(pix); break;
@@ -619,6 +631,7 @@ class PolyBus {
       #ifndef CONFIG_IDF_TARGET_ESP32S2
       case I_32_I1_TM1_4: delete (static_cast<B_32_I1_TM1_4*>(busPtr)); break;
       #endif
+      case I_HS2_WS1_3: delete (static_cast<B_HS2_WS1_3*>(busPtr)); break;
     #endif
       case I_HS_DOT_3: delete (static_cast<B_HS_DOT_3*>(busPtr)); break;
       case I_SS_DOT_3: delete (static_cast<B_SS_DOT_3*>(busPtr)); break;
@@ -645,7 +658,13 @@ class PolyBus {
       switch (busType) {
         case TYPE_APA102:  t = I_SS_DOT_3; break;
         case TYPE_LPD8806: t = I_SS_LPD_3; break;
-        case TYPE_WS2801:  t = I_SS_WS1_3; break;
+        case TYPE_WS2801:
+          t = I_SS_WS1_3;
+          if (num == 1) {
+              t = I_HS2_WS1_3;
+              isHSPI = false;
+          }
+        break;
         case TYPE_P9813:   t = I_SS_P98_3; break;
         default: t=I_NONE;
       }
